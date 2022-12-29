@@ -3,6 +3,7 @@ package com.italkutalk.lab13
 import android.app.Service
 import android.content.Intent
 import android.os.IBinder
+import kotlinx.coroutines.*
 
 class MyService : Service() {
     private var channel = ""
@@ -21,11 +22,13 @@ class MyService : Service() {
             }
         )
         //若 thread 被初始化過且正在運行，則中斷它
-        if (::thread.isInitialized && thread.isAlive)
-            thread.interrupt()
-        thread = Thread {
+//        if (::thread.isInitialized && thread.isAlive)
+//            thread.interrupt()
+//        thread = Thread {
+        val job: Job = GlobalScope.launch(Dispatchers.Main) {
+            // launch coroutine in the main thread
             try {
-                Thread.sleep(3000) //延遲三秒
+                delay(3000) //延遲三秒
                 broadcast(
                     when(channel) {
                         "music" -> "即將播放本月 TOP10 音樂"
@@ -38,7 +41,7 @@ class MyService : Service() {
                 e.printStackTrace()
             }
         }
-        thread.start() //啟動執行緒
+        job.start() //啟動執行緒
         return START_STICKY
     }
     override fun onBind(intent: Intent): IBinder? = null

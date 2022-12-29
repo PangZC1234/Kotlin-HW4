@@ -3,13 +3,14 @@ package com.example.lab8
 import android.app.Service
 import android.content.Intent
 import android.os.IBinder
+import kotlinx.coroutines.*
 
 class MyService : Service() {
     override fun onCreate() {
         super.onCreate()
-        Thread {
+        val job: Job = GlobalScope.launch(Dispatchers.Main) {
             try {
-                Thread.sleep(5000)
+                delay(5000)
 
                 val intent = Intent(this@MyService, Main2Activity::class.java)
 
@@ -18,12 +19,12 @@ class MyService : Service() {
             } catch (e: InterruptedException) {
                 e.printStackTrace()
             }
-        }.start()
-        stopSelf()
+        }
+        job.start()
     }
 
     override fun onStartCommand(intent: Intent, flags: Int, startId: Int): Int {
-        stopSelf()
+
         return super.onStartCommand(intent, flags, startId)
     }
 
